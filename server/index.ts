@@ -1,11 +1,13 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import path from "path";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Simple request logging
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -36,37 +38,46 @@ app.use((req, res, next) => {
   next();
 });
 
+// Vercel-specific handling for serverless environment
+const isVercel = process.env.VERCEL === '1';
+
 (async () => {
   const server = await registerRoutes(app);
 
+  // Error handling middleware
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
-
     res.status(status).json({ message });
-    throw err;
+    console.error(err);
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
+  // Set up static file serving for production or development
+  if (process.env.NODE_ENV !== "development") {
+    // In production, serve static files from the dist/public directory
+    const staticPath = path.resolve(process.cwd(), "dist/public");
+    app.use(express.static(staticPath));
+    
+    // Serve index.html for all non-API routes (SPA fallback)
+    app.get("*", (req, res, next) => {
+      if (req.path.startsWith("/api")) {
+        return next();
+      }
+      res.sendFile(path.join(staticPath, "index.html"));
+    });
   } else {
-    serveStatic(app);
+    // In development, use Vite's dev server
+    await setupVite(app, server);
   }
 
-  // Use environment variables for port configuration to support Vercel
-  const port = parseInt(process.env.PORT || '5173', 10);
-  
-  // Don't bind to a specific host in production (Vercel needs this)
-  if (process.env.NODE_ENV === 'production') {
+  // Don't start server in Vercel serverless environment
+  if (!isVercel) {
+    const port = parseInt(process.env.PORT || '5173', 10);
     server.listen(port, () => {
-      log(`serving on port ${port} in production mode`);
-    });
-  } else {
-    server.listen(port, "127.0.0.1", () => {
-      log(`serving on port ${port} in development mode`);
+      log(`serving on port ${port} in ${process.env.NODE_ENV || 'development'} mode`);
     });
   }
+  
+  // Export the Express app for serverless functions
+  module.exports = app;
 })();
