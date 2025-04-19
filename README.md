@@ -4,7 +4,10 @@ A smart clothing recommendation app that suggests what to wear based on current 
 
 ## Deployment
 
-This application is deployed on Vercel and can be accessed at: https://weather-wear-steel.vercel.app/
+This application is deployed on multiple platforms:
+
+- **Vercel**: https://weather-wear-steel.vercel.app/ (Full functionality)
+- **GitHub Pages**: https://andreaperaltro.github.io/weather-wear/ (Static demo version)
 
 ## Features
 
@@ -51,6 +54,26 @@ npm run dev
 
 The application will be available at http://localhost:5173
 
+## Deployment Options
+
+### Deploying to GitHub Pages
+
+The project includes GitHub Actions workflow for automatic deployment to GitHub Pages:
+
+1. Push changes to the main branch
+2. GitHub Actions will automatically build and deploy the static version
+3. Access the deployed version at https://andreaperaltro.github.io/weather-wear/
+
+Note: The GitHub Pages version is a static demo with limited functionality.
+
+### Deploying to Vercel
+
+For full functionality with API support, deploy to Vercel:
+
+1. Connect your GitHub repository to Vercel
+2. Configure environment variables for API keys
+3. Deploy using the existing vercel.json configuration
+
 ## Screenshots
 
 (Screenshots will be added here)
@@ -61,5 +84,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Acknowledgments
 
-- Weather data provided by [Open-Meteo](https://open-meteo.com/)
-- Icons created with custom SVG elements
+- Weather data provided by [WeatherAPI.com](https://www.weatherapi.com/)
+- Icons created with custom SVG elements and emoji fallbacks
