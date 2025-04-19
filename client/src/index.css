@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+/* Default dark mode variables */
+:root {
+  --background-primary: #121212;
+  --background-secondary: #1E1E1E;
+  --background-tertiary: #333333;
+  --background-quaternary: #444444;
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --border-color: #666666;
+  --cold-color: #52B7FF;
+  --hot-color: #FF5252;
+}
+
+/* Light mode variables */
+.light-mode {
+  --background-primary: #F8F9FA;
+  --background-secondary: #FFFFFF;
+  --background-tertiary: #EAEAEA;
+  --background-quaternary: #D8D8D8;
+  --text-primary: #121212;
+  --text-secondary: rgba(0, 0, 0, 0.7);
+  --border-color: #AAAAAA;
+  --cold-color: #1E88E5;
+  --hot-color: #E53935;
+}
+
+/* Apply CSS variables */
+.min-h-screen {
+  background-color: var(--background-primary);
+  color: var(--text-primary);
+}
+
+.border-\[\#666666\] {
+  border-color: var(--border-color);
+}
+
+.bg-\[\#121212\] {
+  background-color: var(--background-primary);
+}
+
+.bg-\[\#1E1E1E\] {
+  background-color: var(--background-secondary);
+}
+
+.bg-\[\#333333\] {
+  background-color: var(--background-tertiary);
+}
+
+.bg-\[\#444444\] {
+  background-color: var(--background-quaternary);
+}
+
+.text-\[\#FF5252\] {
+  color: var(--hot-color);
+}
+
+.text-\[\#52B7FF\] {
+  color: var(--cold-color);
+}
+
+.border-\[\#FF5252\] {
+  border-color: var(--hot-color);
+}
+
+.border-\[\#52B7FF\] {
+  border-color: var(--cold-color);
+}
+
+.opacity-70 {
+  color: var(--text-secondary);
+}
