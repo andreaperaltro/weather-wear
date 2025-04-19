@@ -58,11 +58,34 @@ The application will be available at http://localhost:5173
 
 ### Deploying to GitHub Pages
 
-The project includes GitHub Actions workflow for automatic deployment to GitHub Pages:
+To manually deploy to GitHub Pages:
 
-1. Push changes to the main branch
-2. GitHub Actions will automatically build and deploy the static version
-3. Access the deployed version at https://andreaperaltro.github.io/weather-wear/
+1. Build the client:
+   ```bash
+   cd client
+   npm run build
+   ```
+
+2. Create or checkout a branch named `gh-pages`:
+   ```bash
+   git checkout -b gh-pages
+   ```
+
+3. Copy the build files to the root:
+   ```bash
+   cp -r dist/* .
+   ```
+
+4. Commit and push the changes:
+   ```bash
+   git add .
+   git commit -m "Deploy to GitHub Pages"
+   git push origin gh-pages
+   ```
+
+5. In your GitHub repository settings, set up GitHub Pages to use the `gh-pages` branch.
+
+6. Access the deployed version at https://andreaperaltro.github.io/weather-wear/
 
 Note: The GitHub Pages version is a static demo with limited functionality.
 

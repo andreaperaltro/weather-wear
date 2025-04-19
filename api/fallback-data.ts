@@ -4,63 +4,68 @@
 export const fallbackData = {
   location: {
     name: "Milan",
+    region: "Lombardy",
     country: "Italy",
-    lat: 45.4642,
-    lon: 9.19
+    lat: 45.47,
+    lon: 9.18
   },
   current: {
-    temp: 18.5,
-    feelsLike: 17.6,
-    condition: "Clear",
-    conditionIcon: "01d",
-    humidity: 68,
-    wind: 7,
-    precipitation: 0,
-    uv: 0,
-    date: "SAT, 20 APR",
-    time: "12:34",
-    hasRainOrSnow: false
+    temp_c: 18,
+    condition: {
+      text: "Partly cloudy",
+      code: 1003
+    },
+    wind_kph: 15,
+    humidity: 65,
+    feelslike_c: 17.5
   },
-  forecast: [
-    {
-      date: "SAT, 20 APR",
-      maxTemp: 20.2,
-      minTemp: 12.4,
-      condition: "Clear",
-      precipitationProbability: 0,
-      hasRainOrSnow: false
-    },
-    {
-      date: "SUN, 21 APR",
-      maxTemp: 21.5,
-      minTemp: 13.1,
-      condition: "Clear",
-      precipitationProbability: 0,
-      hasRainOrSnow: false
-    },
-    {
-      date: "MON, 22 APR",
-      maxTemp: 19.8,
-      minTemp: 14.3,
-      condition: "Rain",
-      precipitationProbability: 60,
-      hasRainOrSnow: true
-    },
-    {
-      date: "TUE, 23 APR",
-      maxTemp: 17.5,
-      minTemp: 11.9,
-      condition: "Drizzle",
-      precipitationProbability: 30,
-      hasRainOrSnow: true
-    },
-    {
-      date: "WED, 24 APR",
-      maxTemp: 18.7,
-      minTemp: 12.5,
-      condition: "Clear",
-      precipitationProbability: 0,
-      hasRainOrSnow: false
-    }
-  ]
+  forecast: {
+    forecastday: [
+      {
+        date: new Date().toISOString().split('T')[0],
+        day: {
+          maxtemp_c: 22,
+          mintemp_c: 14,
+          condition: {
+            text: "Partly cloudy",
+            code: 1003
+          }
+        },
+        hour: [
+          {
+            time: `${new Date().toISOString().split('T')[0]} 08:00`,
+            temp_c: 16,
+            condition: {
+              text: "Sunny",
+              code: 1000
+            }
+          },
+          {
+            time: `${new Date().toISOString().split('T')[0]} 12:00`,
+            temp_c: 20,
+            condition: {
+              text: "Partly cloudy",
+              code: 1003
+            }
+          },
+          {
+            time: `${new Date().toISOString().split('T')[0]} 16:00`,
+            temp_c: 22,
+            condition: {
+              text: "Partly cloudy",
+              code: 1003
+            }
+          },
+          {
+            time: `${new Date().toISOString().split('T')[0]} 20:00`,
+            temp_c: 18,
+            condition: {
+              text: "Clear",
+              code: 1000
+            }
+          }
+        ]
+      }
+    ]
+  }
 }; 
