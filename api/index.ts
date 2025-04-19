@@ -1,5 +1,17 @@
 // Special handler for Vercel serverless functions
-// This file just re-exports the Express app from server/index.ts
-import '../dist/index.js';
+import express from 'express';
+import { registerRoutes } from '../server/routes';
 
-// The export is handled in server/index.ts via module.exports 
+// Set up Vercel serverless environment variables
+process.env.VERCEL = '1';
+
+// Create Express app instance
+const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
+// Set up routes
+registerRoutes(app);
+
+// Export handler for Vercel
+export default app; 

@@ -73,7 +73,7 @@ const isVercel = process.env.VERCEL === '1';
   // Don't start server in Vercel serverless environment
   if (!isVercel) {
     const port = parseInt(process.env.PORT || '5173', 10);
-    server.listen(port, () => {
+    server.listen(port, '127.0.0.1', () => {
       log(`serving on port ${port} in ${process.env.NODE_ENV || 'development'} mode`);
     });
   }
