@@ -1,0 +1,10 @@
+{
+  "name": "weather-wardrobe-api",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@vercel/node": "^3.0.21",
+    "date-fns": "^3.6.0",
+    "node-fetch": "^2.7.0"
+  }
+} 
