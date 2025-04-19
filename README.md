@@ -1,55 +1,51 @@
-# WeatherWear
+# WeatherWardrobe
 
-A brutalist-style weather app that recommends appropriate clothing based on current weather conditions.
+A smart clothing recommendation app that suggests what to wear based on current weather conditions.
 
 ## Features
 
-- Location search and geolocation detection
-- Current weather conditions display
-- 5-day weather forecast
-- Clothing recommendations based on weather conditions (not just temperature)
-- Dark/light mode toggle
-- Responsive design for mobile and desktop
+- **Real-time Weather Data**: Displays current weather conditions including temperature, precipitation, and forecasts.
+- **Smart Outfit Recommendations**: Suggests appropriate clothing items categorized as:
+  - **Essentials**: Core clothing items everyone needs
+  - **Weather Protection**: Items to protect from current weather conditions
+  - **Accessories**: Optional items that enhance comfort
+- **5-Day Forecast**: View weather predictions and clothing recommendations for upcoming days.
+- **Emoji-based Icons**: Visual representations of both weather conditions and clothing items.
 
-## Technology Stack
+## Technical Implementation
 
-- **Frontend**: React, TypeScript, TailwindCSS
-- **Backend**: Node.js, Express
-- **Weather API**: Open-Meteo (free, no API key required)
-- **Styling**: Custom SVG icons, Brutalist design approach
+- **Frontend**: React with TypeScript and Tailwind CSS
+- **Backend**: Node.js Express server
+- **Weather-adaptive Clothing Logic**: Custom algorithm that categorizes clothing based on temperature ranges and weather conditions
+- **Responsive Design**: Optimized for both mobile and desktop views
 
-## Getting Started
+## Architecture
 
-### Prerequisites
+The clothing recommendation system intelligently organizes items into three categories:
+1. **Essentials**: Basic items like shirts, pants, and footwear
+2. **Weather Protection**: Items specifically for current weather (umbrellas, warm hats, etc.)
+3. **Accessories**: Additional items for comfort (sunglasses, water bottles, etc.)
 
-- Node.js 18+ and npm
+## Weather-Based Logic
 
-### Installation
+- **Cold Weather (<15°C)**: Prioritizes head covering and proper footwear
+- **Warm Weather (≥15°C)**: Focuses on light clothing with sun protection
+- **Precipitation**: Automatically prioritizes items like umbrellas
+- **Extreme Temperatures**: Adjusts the minimum number of recommended items
 
-1. Clone the repository
+## Development
+
+To run the project locally:
+
 ```bash
-git clone https://github.com/yourusername/weatherwear.git
-cd weatherwear
-```
-
-2. Install dependencies
-```bash
+# Install dependencies
 npm install
-```
 
-3. Start the development server
-```bash
+# Start the development server
 npm run dev
 ```
 
-4. Open your browser and navigate to `http://localhost:5000`
-
-## Usage
-
-1. Search for a location by city name or use the geolocation button.
-2. View the current weather conditions and recommended outfit.
-3. Check the 5-day forecast for planning ahead.
-4. Toggle between dark and light modes using the button in the top-right corner.
+The application will be available at http://localhost:5173
 
 ## Screenshots
 

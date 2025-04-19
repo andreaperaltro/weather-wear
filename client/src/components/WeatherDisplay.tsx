@@ -1,55 +1,11 @@
 import { WeatherData } from "@shared/schema";
-import { WeatherIcon } from "@/icons/WeatherIcons";
-import { getOutfitRecommendation } from "@/icons/ClothingIcons";
+import OutfitRecommendation from "@/components/OutfitRecommendation";
+import NewWeatherIcon from "@/components/NewWeatherIcon";
 
 interface WeatherDisplayProps {
   weatherData: WeatherData | undefined;
   isLoading: boolean;
   isError: boolean;
-}
-
-// Helper component to show today's outfit recommendation
-function TodayOutfitPreview({ weatherData }: { weatherData: WeatherData }) {
-  const temp = weatherData.current.temp;
-  const condition = weatherData.current.condition;
-  const precipitation = weatherData.current.precipitation || 0;
-  const hasPrecipitation = weatherData.current.hasRainOrSnow || precipitation > 0;
-  
-  const recommendation = getOutfitRecommendation(temp, condition, hasPrecipitation);
-  
-  return (
-    <div>
-      <div className="grid grid-cols-3 gap-3 mb-4">
-        <div className="bg-[#444444] p-2 flex flex-col items-center justify-center">
-          {recommendation.head.icon}
-          <span className="text-xs uppercase mt-1">{recommendation.head.label}</span>
-        </div>
-        <div className="bg-[#444444] p-2 flex flex-col items-center justify-center">
-          {recommendation.upper.icon}
-          <span className="text-xs uppercase mt-1">{recommendation.upper.label}</span>
-        </div>
-        <div className="bg-[#444444] p-2 flex flex-col items-center justify-center">
-          {recommendation.lower.icon}
-          <span className="text-xs uppercase mt-1">{recommendation.lower.label}</span>
-        </div>
-        <div className="bg-[#444444] p-2 flex flex-col items-center justify-center">
-          {recommendation.foot.icon}
-          <span className="text-xs uppercase mt-1">{recommendation.foot.label}</span>
-        </div>
-        <div className="bg-[#444444] p-2 flex flex-col items-center justify-center">
-          {recommendation.accessory.icon}
-          <span className="text-xs uppercase mt-1">{recommendation.accessory.label}</span>
-        </div>
-        <div className="bg-[#444444] p-2 flex flex-col items-center justify-center">
-          {recommendation.extra.icon}
-          <span className="text-xs uppercase mt-1">{recommendation.extra.label}</span>
-        </div>
-      </div>
-      <div className="bg-[#444444] p-2">
-        <p className="text-xs uppercase">{recommendation.advice}</p>
-      </div>
-    </div>
-  );
 }
 
 export default function WeatherDisplay({ 
@@ -91,7 +47,7 @@ export default function WeatherDisplay({
                 </div>
                 <div>
                   <div className="text-5xl md:text-6xl mb-2">
-                    <WeatherIcon condition={weatherData.current.condition} />
+                    <NewWeatherIcon condition={weatherData.current.condition} className="h-16 w-16" />
                   </div>
                   <div className="uppercase text-sm md:text-base">{weatherData.current.condition}</div>
                 </div>
@@ -148,7 +104,9 @@ export default function WeatherDisplay({
             {/* Today's clothing recommendation */}
             <div className="md:w-1/2 bg-[#333333] border-2 border-[#666666] p-4">
               <h3 className="text-sm uppercase font-bold mb-3">TODAY'S OUTFIT</h3>
-              <TodayOutfitPreview weatherData={weatherData} />
+              <div className="grid grid-cols-3 gap-3">
+                {weatherData && <OutfitRecommendation weatherData={weatherData} simplified={true} />}
+              </div>
             </div>
           </div>
         </div>

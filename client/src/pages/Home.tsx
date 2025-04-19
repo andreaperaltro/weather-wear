@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { WeatherData } from "@shared/schema";
 import LocationInput from "@/components/LocationInput";
 import WeatherDisplay from "@/components/WeatherDisplay";
-import OutfitRecommendation from "@/components/OutfitRecommendation";
 import InitialMessage from "@/components/InitialMessage";
 import ForecastDisplay from "@/components/ForecastDisplay";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -35,7 +34,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen font-mono text-white bg-[#121212]">
+    <div className="min-h-screen text-white bg-[#121212]">
       <div className="container max-w-4xl mx-auto px-4 py-6 md:py-12">
         <div className="flex justify-between items-center mb-8 md:mb-12">
           <header>
