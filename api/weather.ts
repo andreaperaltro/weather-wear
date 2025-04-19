@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 const WEATHER_API_URL = "https://api.open-meteo.com/v1/forecast";
 const GEO_API_URL = "https://geocoding-api.open-meteo.com/v1/search";
 
+// This is a Vercel Serverless Function
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse
