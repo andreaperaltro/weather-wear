@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { WeatherData } from "@shared/schema";
 import LocationInput from "@/components/LocationInput";
@@ -9,13 +9,31 @@ import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Home() {
   const [location, setLocation] = useState<string>("");
+  const [useFallback, setUseFallback] = useState<boolean>(false);
   
-  const { data: weatherData, isLoading, isError, refetch } = useQuery<WeatherData>({
-    queryKey: [`/api/weather?location=${encodeURIComponent(location)}`],
-    enabled: !!location,
+  // Construct the API URL with fallback parameter if needed
+  const apiUrl = useFallback 
+    ? `/api/weather?fallback=true` 
+    : `/api/weather?location=${encodeURIComponent(location)}`;
+  
+  const { data: weatherData, isLoading, isError, error, refetch } = useQuery<WeatherData>({
+    queryKey: [apiUrl],
+    enabled: !!location || useFallback,
+    retry: 1,
+    retryDelay: 1000,
   });
 
+  // If there's an error, switch to fallback data
+  useEffect(() => {
+    if (isError && !useFallback) {
+      console.error("Error fetching weather data:", error);
+      console.log("Switching to fallback data");
+      setUseFallback(true);
+    }
+  }, [isError, error, useFallback]);
+
   const handleSearch = (searchValue: string) => {
+    setUseFallback(false); // Reset fallback when user searches
     setLocation(searchValue);
   };
 
@@ -24,12 +42,25 @@ export default function Home() {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
+          setUseFallback(false); // Reset fallback when using geolocation
           setLocation(`${latitude},${longitude}`);
         },
         (error) => {
           console.error("Error getting location:", error);
+          setUseFallback(true); // Use fallback on geolocation error
         }
       );
+    } else {
+      setUseFallback(true); // Use fallback if geolocation not available
+    }
+  };
+
+  // Function to retry with fallback data
+  const handleRetry = () => {
+    if (isError && !useFallback) {
+      setUseFallback(true);
+    } else {
+      refetch();
     }
   };
 
@@ -55,20 +86,27 @@ export default function Home() {
           location={location}
         />
 
-        {!location && !isLoading && !weatherData && !isError && (
+        {!location && !useFallback && !isLoading && !weatherData && !isError && (
           <InitialMessage />
         )}
 
-        {(!!location || isLoading || weatherData || isError) && (
+        {(!!location || useFallback || isLoading || weatherData || isError) && (
           <WeatherDisplay 
             weatherData={weatherData} 
             isLoading={isLoading} 
-            isError={isError} 
+            isError={isError && !useFallback}
+            onRetry={handleRetry}
           />
         )}
 
-        {weatherData?.forecast && weatherData.forecast.length > 0 && !isLoading && !isError && (
+        {weatherData?.forecast && weatherData.forecast.length > 0 && !isLoading && (!isError || useFallback) && (
           <ForecastDisplay forecast={weatherData.forecast} />
+        )}
+
+        {useFallback && weatherData && (
+          <div className="mt-4 text-center text-xs opacity-70">
+            <p>Using demo data. Weather information may not be accurate.</p>
+          </div>
         )}
       </div>
     </div>

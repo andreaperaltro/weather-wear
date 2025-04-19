@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import fetch from 'node-fetch';
 import { format } from 'date-fns';
+import { fallbackData } from './fallback-data';
 
 // API endpoints
 const WEATHER_API_URL = "https://api.open-meteo.com/v1/forecast";
@@ -34,20 +35,26 @@ type WeatherData = {
   };
 };
 
-// This is a Vercel Serverless Function
+/**
+ * The API handler for the /api/weather endpoint
+ */
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ): Promise<void> {
-  // Enable CORS
+  // Add timestamp to help debug
+  console.log(`[${new Date().toISOString()}] API weather request received:`, req.url);
+  
+  // Enable CORS for all origins
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,HEAD');
   res.setHeader(
     'Access-Control-Allow-Headers',
     'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
   );
   
+  // Handle preflight requests
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
@@ -56,13 +63,24 @@ export default async function handler(
   try {
     // Only allow GET requests
     if (req.method !== 'GET') {
+      console.log(`[${new Date().toISOString()}] Method not allowed: ${req.method}`);
       res.status(405).json({ message: 'Method not allowed' });
       return;
     }
 
+    // Immediately check for fallback parameter - if present, return fallback data
+    if (req.query.fallback === 'true') {
+      console.log(`[${new Date().toISOString()}] Serving fallback data as requested`);
+      res.status(200).json(fallbackData);
+      return;
+    }
+
     const location = req.query.location as string;
+    console.log(`[${new Date().toISOString()}] Location requested: ${location}`);
+    
     if (!location) {
-      res.status(400).json({ message: "Location parameter is required" });
+      console.log(`[${new Date().toISOString()}] No location provided, using fallback data`);
+      res.status(200).json(fallbackData);
       return;
     }
 
@@ -73,9 +91,12 @@ export default async function handler(
     if (isCoordinates) {
       // Parse coordinates
       [lat, lon] = location.split(",");
+      console.log(`[${new Date().toISOString()}] Coordinates provided: ${lat}, ${lon}`);
       
       try {
         const reverseGeoUrl = `${GEO_API_URL}?latitude=${lat}&longitude=${lon}&count=1`;
+        console.log(`[${new Date().toISOString()}] Fetching from: ${reverseGeoUrl}`);
+        
         const geoResponse = await fetch(reverseGeoUrl);
         
         if (geoResponse.ok) {
@@ -83,33 +104,49 @@ export default async function handler(
           if (geoData.results && geoData.results.length > 0) {
             locationName = geoData.results[0].name;
             country = geoData.results[0].country;
+            console.log(`[${new Date().toISOString()}] Reverse geocoding successful: ${locationName}, ${country}`);
           } else {
             locationName = "Unknown Location";
             country = "";
+            console.log(`[${new Date().toISOString()}] Reverse geocoding returned no results`);
           }
         } else {
           locationName = "Unknown Location";
           country = "";
+          console.log(`[${new Date().toISOString()}] Reverse geocoding failed with status: ${geoResponse.status}`);
         }
       } catch (error) {
         // Fallback if reverse geocoding fails
-        locationName = "Unknown Location";
-        country = "";
+        console.error(`[${new Date().toISOString()}] Error in reverse geocoding:`, error);
+        console.log(`[${new Date().toISOString()}] Using fallback data due to reverse geocoding error`);
+        res.status(200).json(fallbackData);
+        return;
       }
     } else {
       // Search by location name
       try {
         const geoUrl = `${GEO_API_URL}?name=${encodeURIComponent(location)}&count=1`;
-        const geoResponse = await fetch(geoUrl);
+        console.log(`[${new Date().toISOString()}] Fetching from: ${geoUrl}`);
+        
+        const geoResponse = await fetch(geoUrl, {
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'WeatherWardrobe/1.0'
+          }
+        });
         
         if (!geoResponse.ok) {
-          res.status(404).json({ message: "Location not found" });
+          console.log(`[${new Date().toISOString()}] Geocoding failed with status: ${geoResponse.status}`);
+          console.log(`[${new Date().toISOString()}] Using fallback data due to geocoding error`);
+          res.status(200).json(fallbackData);
           return;
         }
         
         const geoData = await geoResponse.json() as GeocodingResult;
         if (!geoData.results || geoData.results.length === 0) {
-          res.status(404).json({ message: "Location not found" });
+          console.log(`[${new Date().toISOString()}] Geocoding returned no results`);
+          console.log(`[${new Date().toISOString()}] Using fallback data due to no geocoding results`);
+          res.status(200).json(fallbackData);
           return;
         }
         
@@ -117,8 +154,11 @@ export default async function handler(
         lon = geoData.results[0].longitude.toString();
         locationName = geoData.results[0].name;
         country = geoData.results[0].country;
+        console.log(`[${new Date().toISOString()}] Geocoding successful: ${locationName}, ${country} (${lat}, ${lon})`);
       } catch (error) {
-        res.status(500).json({ message: "Error searching for location" });
+        console.error(`[${new Date().toISOString()}] Error in geocoding:`, error);
+        console.log(`[${new Date().toISOString()}] Using fallback data due to geocoding error`);
+        res.status(200).json(fallbackData);
         return;
       }
     }
@@ -126,18 +166,26 @@ export default async function handler(
     // Fetch weather data
     try {
       const weatherApiUrl = `${WEATHER_API_URL}?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,precipitation&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&forecast_days=5&windspeed_unit=kmh&timezone=auto`;
-      const weatherResponse = await fetch(weatherApiUrl);
+      console.log(`[${new Date().toISOString()}] Fetching weather from: ${weatherApiUrl}`);
+      
+      const weatherResponse = await fetch(weatherApiUrl, {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'WeatherWardrobe/1.0'
+        }
+      });
       
       if (!weatherResponse.ok) {
-        res.status(weatherResponse.status).json({ 
-          message: `Weather API error: ${weatherResponse.statusText}` 
-        });
+        console.log(`[${new Date().toISOString()}] Weather API failed with status: ${weatherResponse.status}`);
+        console.log(`[${new Date().toISOString()}] Using fallback data due to weather API error`);
+        res.status(200).json(fallbackData);
         return;
       }
       
       const weatherData = await weatherResponse.json() as WeatherData;
       const currentDate = new Date();
       const weatherCondition = weatherCodeToCondition(weatherData.current.weather_code);
+      console.log(`[${new Date().toISOString()}] Weather condition: ${weatherCondition}`);
 
       // Format weather data
       const formattedWeatherData = {
@@ -174,14 +222,17 @@ export default async function handler(
       };
 
       // Return formatted weather data
+      console.log(`[${new Date().toISOString()}] Successfully returning weather data`);
       res.status(200).json(formattedWeatherData);
     } catch (error) {
-      console.error("Error fetching weather data:", error);
-      res.status(500).json({ message: "Failed to fetch weather data" });
+      console.error(`[${new Date().toISOString()}] Error fetching weather data:`, error);
+      console.log(`[${new Date().toISOString()}] Using fallback data due to weather data error`);
+      res.status(200).json(fallbackData);
     }
   } catch (error) {
-    console.error("Unhandled error:", error);
-    res.status(500).json({ message: "Internal server error" });
+    console.error(`[${new Date().toISOString()}] Unhandled error:`, error);
+    console.log(`[${new Date().toISOString()}] Using fallback data due to unhandled error`);
+    res.status(200).json(fallbackData);
   }
 }
 

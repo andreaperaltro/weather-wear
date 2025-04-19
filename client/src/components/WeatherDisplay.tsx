@@ -6,12 +6,14 @@ interface WeatherDisplayProps {
   weatherData: WeatherData | undefined;
   isLoading: boolean;
   isError: boolean;
+  onRetry?: () => void;
 }
 
 export default function WeatherDisplay({ 
   weatherData, 
   isLoading, 
-  isError 
+  isError,
+  onRetry
 }: WeatherDisplayProps) {
   return (
     <div className="border-[3px] border-[#666666] bg-[#1E1E1E] p-4 md:p-6 mb-8 md:mb-10">
@@ -119,6 +121,14 @@ export default function WeatherDisplay({
           </svg>
           <p className="mt-4 uppercase font-bold text-[#FF5252]">LOCATION NOT FOUND</p>
           <p className="mt-2 text-sm">PLEASE TRY ANOTHER CITY NAME</p>
+          {onRetry && (
+            <button
+              onClick={onRetry}
+              className="mt-4 bg-[#444444] hover:bg-[#555555] text-white uppercase px-4 py-2 text-sm font-bold border border-[#666666]"
+            >
+              Use Demo Data
+            </button>
+          )}
         </div>
       )}
     </div>
