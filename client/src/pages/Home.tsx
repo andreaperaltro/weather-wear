@@ -8,17 +8,18 @@ import ForecastDisplay from "@/components/ForecastDisplay";
 import ThemeToggle from "@/components/ThemeToggle";
 
 // Check if we're on GitHub Pages
-const isGitHubPages = window.location.hostname.includes('github.io');
+const isGitHubPages = window.location.hostname.includes('github.io') || 
+                      window.location.pathname.includes('/weather-wear/');
 
 export default function Home() {
-  const [location, setLocation] = useState<string>("");
+  const [location, setLocation] = useState<string>("Milan");
   const [useFallback, setUseFallback] = useState<boolean>(isGitHubPages);
   const [showDebug, setShowDebug] = useState<boolean>(false);
   const [errorDetails, setErrorDetails] = useState<string>("");
   
   // Construct the API URL with fallback parameter if needed
   const apiUrl = useFallback || isGitHubPages
-    ? (isGitHubPages ? "/weather-wear/api/weather.json" : `/api/weather?fallback=true`)
+    ? (isGitHubPages ? "api/weather.json" : `/api/weather?fallback=true`)
     : `/api/weather?location=${encodeURIComponent(location)}`;
   
   const {
@@ -31,7 +32,7 @@ export default function Home() {
     failureReason
   } = useQuery<WeatherData>({
     queryKey: [apiUrl],
-    enabled: !!location || useFallback,
+    enabled: true, // Always enabled for GitHub Pages
     retry: 1,
     retryDelay: 1000,
   });
@@ -53,6 +54,13 @@ export default function Home() {
       setUseFallback(true);
     }
   }, [isError, error, useFallback]);
+
+  // On GitHub Pages, make sure to use fallback data
+  useEffect(() => {
+    if (isGitHubPages) {
+      setUseFallback(true);
+    }
+  }, []);
 
   const handleSearch = (searchValue: string) => {
     if (!isGitHubPages) {
