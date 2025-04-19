@@ -1,7 +1,7 @@
 import { ForecastData } from "@shared/schema";
 import { getOutfitRecommendation } from "@/icons/ClothingIcons";
 import NewWeatherIcon from "@/components/NewWeatherIcon";
-import NewClothingIcon from "@/components/NewClothingIcon";
+import { NewClothingIcon } from "@/components/NewClothingIcon";
 import { useState } from "react";
 
 interface ForecastDisplayProps {

@@ -1,6 +1,6 @@
 import { WeatherData } from "@shared/schema";
 import { getOutfitRecommendation } from "@/icons/ClothingIcons";
-import NewClothingIcon from "@/components/NewClothingIcon";
+import { NewClothingIcon } from "@/components/NewClothingIcon";
 
 interface OutfitRecommendationProps {
   weatherData: WeatherData;
