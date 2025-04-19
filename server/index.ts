@@ -56,9 +56,17 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // Use a standard Vite development port that will work on most systems
-  const port = 5173;
-  server.listen(port, "127.0.0.1", () => {
-    log(`serving on port ${port}`);
-  });
+  // Use environment variables for port configuration to support Vercel
+  const port = parseInt(process.env.PORT || '5173', 10);
+  
+  // Don't bind to a specific host in production (Vercel needs this)
+  if (process.env.NODE_ENV === 'production') {
+    server.listen(port, () => {
+      log(`serving on port ${port} in production mode`);
+    });
+  } else {
+    server.listen(port, "127.0.0.1", () => {
+      log(`serving on port ${port} in development mode`);
+    });
+  }
 })();
