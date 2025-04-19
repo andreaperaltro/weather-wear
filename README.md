@@ -2,6 +2,10 @@
 
 A smart clothing recommendation app that suggests what to wear based on current weather conditions.
 
+## Deployment
+
+This application is deployed on Vercel and can be accessed at: https://weather-wear-steel.vercel.app/
+
 ## Features
 
 - **Real-time Weather Data**: Displays current weather conditions including temperature, precipitation, and forecasts.
