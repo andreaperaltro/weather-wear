@@ -1,5 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "cd client && npm install && npm run build",
-  "outputDirectory": "client/dist"
+  "buildCommand": "cd client && npm install && TAILWIND_CONFIG_PATH=\"../tailwind.config.ts\" npm run build",
+  "outputDirectory": "client/dist",
+  "installCommand": "npm install"
 } 

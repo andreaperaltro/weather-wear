@@ -20,10 +20,6 @@
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-
   body {
     @apply antialiased bg-background text-foreground;
     font-family: 'PP Mondwest', system-ui, sans-serif;
